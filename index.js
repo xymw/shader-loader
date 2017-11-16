@@ -83,13 +83,23 @@ function onChunksLoaded () {
         this.finalString = this.finalString.replace(re, chunks[key])
     }
 
-    var s = new Readable()
-    s._read = function noop () {}
-    s.push(this.finalString)
-    s.push(null)
-    this.res = ''
-    s.pipe(Tokenizer()).pipe(Parser()).pipe(Minify(['main', 'x', 'y', 'z', 'texCoord0', 'bakedTc'], false)).pipe(Deparser(false)).on('data', function (chunk) { this.res += chunk }).on('end', function () {
-        this.finalString = "module.exports = " + JSON.stringify(this.res)
+    var options = loaderUtils.getOptions(this) || {}
+    if (options.minify) {
+        var s = new Readable()
+        s._read = function noop () {}
+        s.push(this.finalString)
+        s.push(null)
+        var res = ''
+        var onData = function (chunk) {
+            res += chunk
+        }
+        var onEnd = function () {
+            this.finalString = "module.exports = " + JSON.stringify(res)
+            this.callback(null, this.finalString)
+        }.bind(this)
+        s.pipe(Tokenizer()).pipe(Parser()).pipe(Minify(['main', 'x', 'y', 'z', 'texCoord0', 'bakedTc'], false)).pipe(Deparser(false)).on('data', onData).on('end', onEnd)
+    } else {
+        this.finalString = "module.exports = " + JSON.stringify(this.finalString)
         this.callback(null, this.finalString)
-    });
+    }
 }
