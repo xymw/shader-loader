@@ -94,10 +94,10 @@ function onChunksLoaded () {
             res += chunk
         }
         var onEnd = function () {
+            this.finalString = "module.exports = " + JSON.stringify(res)
             if (this.options.verbose) {
                 console.log('final output', this.finalString)
             }
-            this.finalString = "module.exports = " + JSON.stringify(res)
             this.callback(null, this.finalString)
         }.bind(this)
         s.pipe(Tokenizer()).pipe(Parser()).pipe(Minify(['main', 'x', 'y', 'z', 'texCoord0', 'bakedTc'], false)).pipe(Deparser(false)).on('data', onData).on('end', onEnd)
