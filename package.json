@@ -24,6 +24,10 @@
   },
   "homepage": "https://github.com/Makio64/shader-loader",
   "dependencies": {
+    "glsl-deparser": "^1.0.0",
+    "glsl-min-stream": "git+ssh://git@git.bln.xymatic.com:33669/glsl-min-stream.git#master",
+    "glsl-parser": "^2.0.0",
+    "glsl-tokenizer": "git+ssh://git@git.bln.xymatic.com:33669/glsl-tokenizer.git#master",
     "loader-utils": "^1.1.0"
   }
 }
