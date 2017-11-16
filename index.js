@@ -13,13 +13,14 @@ var chunkPath = ""
 module.exports = function (source) {
     this.cacheable && this.cacheable()
 
+    var options = loaderUtils.getOptions(this) || {}
+
     var uid = new Object()
     uid.callback = this.async()
     uid.finalString = source
     uid.queue = 0
     uid.done = false
-
-    var options = loaderUtils.getOptions(this) || {}
+    uid.options = options
 
     if (options.glsl && options.glsl.chunkPath) {
         chunkPath = options.glsl.chunkPath
@@ -83,8 +84,7 @@ function onChunksLoaded () {
         this.finalString = this.finalString.replace(re, chunks[key])
     }
 
-    var options = loaderUtils.getOptions(this) || {}
-    if (options.minify) {
+    if (this.options.minify) {
         var s = new Readable()
         s._read = function noop () {}
         s.push(this.finalString)
@@ -94,6 +94,9 @@ function onChunksLoaded () {
             res += chunk
         }
         var onEnd = function () {
+            if (this.options.verbose) {
+                console.log('final output', this.finalString)
+            }
             this.finalString = "module.exports = " + JSON.stringify(res)
             this.callback(null, this.finalString)
         }.bind(this)
